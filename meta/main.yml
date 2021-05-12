@@ -1,0 +1,26 @@
+---
+
+galaxy_info:
+  role_name: rspamd
+  namespace: bodsch
+
+  author: Bodo Schulz
+  description: installs and configure rspamd
+  license: BSD
+  min_ansible_version: 2.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - 18.04
+        - 20.04
+    - name: Debian
+      versions:
+        - 9
+        - 10
+
+  galaxy_tags:
+    - mail
+    - spam
+
+dependencies: []
+...

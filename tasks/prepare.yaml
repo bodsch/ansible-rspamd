@@ -1,0 +1,69 @@
+---
+
+- block:
+    - name: add rspamd repo GPG key
+      apt_key:
+        url: https://rspamd.com/apt-stable/gpg.key
+
+    # Use of the distribution packages is discouraged by the rspamd devs
+    - name: add official rspamd repository
+      apt_repository:
+        repo: deb http://rspamd.com/apt-stable/ {{ ansible_distribution_release }} main
+        filename: rspamd
+  when:
+    - ansible_os_family | lower == 'debian'
+
+- block:
+    - name: import EPEL GPG key
+      rpm_key:
+        key: https://archive.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+        state: present
+
+    - name: install EPEL repository
+      yum_repository:
+        name: epel
+        state: present
+        description: Extra Packages for Enterprise Linux {{ ansible_distribution_major_version }} - $basearch
+        baseurl: http://download.fedoraproject.org/pub/epel/{{ ansible_distribution_major_version }}/$basearch
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+        metalink: https://mirrors.fedoraproject.org/metalink?repo=epel-{{ ansible_distribution_major_version }}&arch=$basearch&infra=$infra&content=$contentdir
+        failovermethod: priority
+        gpgcheck: 1
+        enabled: 1
+
+    - name: import rspamd GPG key
+      rpm_key:
+        key: https://rspamd.com/rpm-stable/gpg.key
+        state: present
+
+    - name: install rspamd repository
+      get_url:
+        url: https://rspamd.com/rpm-stable/centos-{{ ansible_distribution_major_version }}/rspamd.repo
+        dest: /etc/yum.repos.d/rspamd.repo
+        mode: 0660
+      register: download_artefact
+      until: download_artefact is succeeded
+      retries: 5
+      delay: 2
+
+    - name: update rpm cache (yum) # noqa 'command-instead-of-module'
+      command: yum clean metadata
+      args:
+        warn: false
+      when:
+        - ansible_distribution_major_version | int == 7
+
+    - name: update rpm cache (dnf) # noqa 'command-instead-of-module'
+      command: dnf clean metadata
+      args:
+        warn: false
+      when:
+        - ansible_distribution_major_version | int >= 8
+  when:
+    - ansible_os_family | lower == 'redhat'
+
+- name: update package cache
+  package:
+    update_cache: true
+
+...

@@ -1,0 +1,8 @@
+---
+
+- name: install rspamd
+  package:
+    name: rspamd
+    state: present
+
+...

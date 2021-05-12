@@ -1,0 +1,41 @@
+---
+
+rspamd_local_config:
+  groups:
+    group:
+      informational:
+        description: Informational (non-weighted) symbols
+        max_score: 0.0
+        symbols:
+          ASN:
+            description: Network information of the source host
+          MAILLIST:
+            description: Name of the mailing list software
+
+rspamd_config_overrides:
+  redis:
+    servers: 127.0.0.1
+  options:
+    neighbours:
+      # The controller workers are proxied by nginx with TLS and basic auth
+      spam01:
+        host: https://127.0.0.1:443
+      spam02:
+        host: https://192.168.178.5:443
+
+rspamd_workers:
+  - type: rspamd_proxy
+    options:
+      bind_socket: localhost:11332
+  - type: normal
+    options:
+      bind_socket: localhost:11333
+  - type: controller
+    options:
+      bind_socket: localhost:11334
+  - type: fuzzy
+    options:
+      bind_socket: localhost:11335
+      count: -1
+
+...

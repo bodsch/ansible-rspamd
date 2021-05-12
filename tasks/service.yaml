@@ -1,0 +1,13 @@
+---
+
+- name: enable rspamd services
+  service:
+    name: rspamd
+    enabled: true
+
+- name: ensure rspamd service are started
+  service:
+    name: rspamd
+    state: started
+
+...
