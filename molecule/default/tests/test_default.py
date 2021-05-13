@@ -73,4 +73,3 @@ def test_service(host):
     service = host.service("rspamd")
     assert service.is_enabled
     assert service.is_running
-
