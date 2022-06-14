@@ -1,5 +1,7 @@
 
 
+# Ansible Role:  `rspamd`
+
 Ansible role to setup rspamd.
 
 
@@ -16,16 +18,30 @@ Ansible role to setup rspamd.
 
 - nothing
 
-### Operating systems
+### Supported (tested) Operating systems
 
 Tested on
 
-* Debian 9 / 10
-* Ubuntu 18.04 / 18.10 / 19.10
-* CentOS 7 / 8
-* Oracle Linux 8
 * Arch Linux
+* Debian based
+    - Debian 10 / 11
+    - Ubuntu 20.10
+
 ---
 
-## Examples
+## Development,  Branches (Git Tags)
 
+The `master` Branch is my *Working Horse* includes the "latest, hot shit" and can be complete broken!
+
+If you want to use something stable, please use a [Tagged Version](https://github.com/bodsch/ansible-prometheus/tags)!
+
+
+## Author and License
+
+- Bodo Schulz
+
+## License
+
+[Apache](LICENSE)
+
+`FREE SOFTWARE, HELL YEAH!`
