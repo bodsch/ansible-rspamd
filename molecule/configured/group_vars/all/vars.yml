@@ -1,7 +1,6 @@
 ---
 
-# https://rspamd.com/doc/configuration/logging.html#configuration-parameters
-rspamd_defaults_logging:
+rspamd_logging:
   ## type                    Defines logging type (file, console or syslog). For some types mandatory attributes may be required.
   type: console
   ## systemd                 If true timestamps aren’t prepended to log messages. Default: false.
@@ -20,8 +19,80 @@ rspamd_defaults_logging:
   ## log_usec                Log microseconds (e.g. 11:43:16.68071). Default: false.
   ## log_severity (2.8+)     Log severity explicitly (e.g. [info] or [error]). Default: false
 
+
+rspamd_local_config:
+  groups:
+    group:
+      informational:
+        description: Informational (non-weighted) symbols
+        max_score: 0.0
+        symbols:
+          ASN:
+            description: Network information of the source host
+          MAILLIST:
+            description: Name of the mailing list software
+  actions:
+    reject: 15
+    add_header: 8
+    greylist: 7
+  dkim_signing:
+    # If false, messages with empty envelope from are not signed
+    allow_envfrom_empty: true
+    # If true, envelope/header domain mismatch is ignored
+    allow_hdrfrom_mismatch: true
+    # If true, multiple from headers are allowed (but only first is used)
+    allow_hdrfrom_multiple: true
+    # If true, username does not need to contain matching domain
+    allow_username_mismatch: true
+    # If false, messages from authenticated users are not selected for signing
+    sign_authenticated: true
+    # Default path to key, can include '$domain' and '$selector' variables
+    path: "/data/dkim/keys/$domain.dkim"
+    # Default selector to use
+    selector: "dkim"
+    # If false, messages from local networks are not selected for signing
+    sign_local: true
+    # Symbol to add when message is signed
+    symbol: "DKIM_SIGNED"
+    # Whether to fallback to global config
+    try_fallback: true
+    # Domain to use for DKIM signing: can be "header" or "envelope"
+    use_domain: "envelope"
+    # Whether to normalise domains to eSLD
+    use_esld: false
+    # Whether to get keys from Redis
+    use_redis: true
+    # Hash for DKIM keys in Redis
+    key_prefix: "DKIM_PRIV_KEYS"
+    # Selector map
+    selector_prefix: "DKIM_SELECTORS"
+    # Sieve is in sign_networks only
+    # forwards are arc signed, rejects are dkim signed
+    sign_networks: "/etc/rspamd/custom/dovecot_trusted.map"
+    use_domain_sign_networks: "header"
+    sign_headers: "from:sender:reply-to:subject:date:message-id:to:cc:mime-version:content-type:content-transfer-encoding:content-language:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:in-reply-to:references:list-id:list-help:list-owner:list-unsubscribe:list-subscribe:list-post:list-unsubscribe-post:disposition-notification-to:disposition-notification-options:original-recipient:openpgp:autocrypt"
+  mx_check:
+    timeout: 8.0
+    symbol_bad_mx: "MX_INVALID"
+    symbol_no_mx: "MX_MISSING"
+    symbol_good_mx: "MX_GOOD"
+    expire: 86400
+    key_prefix: "rmx"
+    enabled: true
+
+rspamd_config_overrides:
+  redis:
+    servers: "127.0.0.1,redis"
+  options:
+    neighbours:
+      # The controller workers are proxied by nginx with TLS and basic auth
+      spam01:
+        host: https://127.0.0.1:443
+      spam02:
+        host: https://192.168.178.5:443
+
 # https://rspamd.com/doc/workers/
-rspamd_defaults_workers:
+rspamd_workers:
   ## normal: this worker is designed to scan mail messages
   normal:
     options:
@@ -53,12 +124,10 @@ rspamd_defaults_workers:
       bind_socket: localhost:11334
       ## password: password for read-only commands
       ## enable_password: password for write commands
-      ## secure_ip: list or map with IP addresses that are treated as secure so all commands are allowed from these IPs without passwords 
-      ##            (if a reverse proxy sets an X-Forwarded-For header, both the proxy and actual client IP must be contained in secure_ip)
+      ## secure_ip: list or map with IP addresses that are treated as secure so all commands are allowed from these IPs without passwords (if a reverse proxy sets an X-Forwarded-For header, both the proxy and actual client IP must be contained in secure_ip)
       ## static_dir: directory where interface static files are placed (usually ${WWWDIR})
       ## stats_path: path where controller save persistent stats about rspamd (such as scanned messages count)
-      ## bind_socket : a string that defines bind address of a worker-controller (web interface). 
-      ##               If the port number is omitted, port 11334 is assumed (see also the common workers options)
+      ## bind_socket : a string that defines bind address of a worker-controller (web interface). If the port number is omitted, port 11334 is assumed (see also the common workers options)
 
   ## fuzzy_storage: stores fuzzy hashes
   fuzzy:
@@ -81,37 +150,9 @@ rspamd_defaults_workers:
       ## master_key - allow master/slave updates merely using the specified key
       ## slave - list of slave hosts.
       ## mirror - list of slave hosts, same as slave
-      ## allow_update - string, array of strings or a map of IP addresses that are allowed to perform changes to fuzzy storage 
-      ##                (you should also set read_only = no in your fuzzy_check plugin
+      ## allow_update - string, array of strings or a map of IP addresses that are allowed to perform changes to fuzzy storage (you should also set read_only = no in your fuzzy_check plugin
 
   ## lua: runs custom Lua scripts
   lua: {}
-
-# https://rspamd.com/doc/configuration/redis.html
-rspamd_defaults_redis: {}
-  ## servers: upstreams list for both read and write requests
-  ## read_servers: upstreams list for read only servers (usually replication slaves)
-  ## write_servers: upstreams list for write only servers (usually replication master)
-  ## timeout: timeout in seconds to get reply from Redis (e.g. 0.5s or 1min)
-  ## db: number of database to use (by default, Rspamd will use the default Redis database with number 0)
-  ## password: password to connect to Redis (no password by default)
-  ## prefix: use the specified prefix for keys in Redis (if supported by module)
-  ## expand_keys (1.7.0+): if set to true ‘expand’ key names used in queries (discussed further below)
-  ##
-  ## ip: sending IP of a message
-  ## principal_recipient: the address of the principal recipient of a message (Deliver-To request header, first SMTP recipient or MIME recipient according to availability)
-  ## principal_recipient_domain: the domain name of the principal recipient
-  ## esld_principal_recipient_domain: the domain name of the principal recipient, normalised to eSLD
-  ## smtp_from: SMTP sender address
-  ## smtp_from_domain: SMTP sender address domain
-  ## esld_smtp_from_domain: SMTP sender address domain, normalised to eSLD
-  ## smtp_from_domain_or_helo: SMTP sender address domain or HELO if address is empty/absent
-  ## esld_smtp_from_domain_or_helo: SMTP sender address domain or HELO if address is empty/absent, normalised to eSLD
-  ## mime_from: MIME sender address
-  ## mime_from_domain: MIME sender address domain
-  ## esld_mime_from_domain: MIME sender address domain, normalised to eSLD
-
-rspamd_defaults_local_config: {}
-rspamd_defaults_config_overrides: {}
 
 ...

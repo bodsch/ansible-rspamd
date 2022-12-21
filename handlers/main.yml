@@ -1,7 +1,7 @@
 ---
 
 - name: restart rspamd
-  service:
+  ansible.builtin.service:
     name: rspamd
     state: restarted
 
