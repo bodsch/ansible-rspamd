@@ -1,12 +1,12 @@
 ---
 
 - name: enable rspamd services
-  service:
+  ansible.builtin.service:
     name: rspamd
     enabled: true
 
 - name: ensure rspamd service are started
-  service:
+  ansible.builtin.service:
     name: rspamd
     state: started
 
