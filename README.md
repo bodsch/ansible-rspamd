@@ -1,17 +1,17 @@
 
-
 # Ansible Role:  `rspamd`
 
 Ansible role to setup rspamd.
 
-
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bodsch/ansible-rspamd/CI)][ci]
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-rspamd/main.yml?logo=github&branch=main)][ci]
 [![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-rspamd)][issues]
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/bodsch/ansible-rspamd)][releases]
+[![Ansible Downloads](https://img.shields.io/ansible/role/d/bodsch/rspamd?logo=ansible)][galaxy]
 
 [ci]: https://github.com/bodsch/ansible-rspamd/actions
 [issues]: https://github.com/bodsch/ansible-rspamd/issues?q=is%3Aopen+is%3Aissue
 [releases]: https://github.com/bodsch/ansible-rspamd/releases
+[galaxy]: https://galaxy.ansible.com/ui/standalone/roles/bodsch/rspamd/
 
 
 ## Requirements & Dependencies
@@ -54,8 +54,9 @@ Tested on
 
 The `master` Branch is my *Working Horse* includes the "latest, hot shit" and can be complete broken!
 
-If you want to use something stable, please use a [Tagged Version](https://github.com/bodsch/ansible-prometheus/tags)!
+If you want to use something stable, please use a [Tagged Version](https://github.com/bodsch/ansible-rspamd/tags)!
 
+---
 
 ## Author and License
 
@@ -65,4 +66,4 @@ If you want to use something stable, please use a [Tagged Version](https://githu
 
 [Apache](LICENSE)
 
-`FREE SOFTWARE, HELL YEAH!`
+**FREE SOFTWARE, HELL YEAH!**

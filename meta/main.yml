@@ -2,6 +2,7 @@
 
 galaxy_info:
   role_name: rspamd
+  namespace: bodsch
 
   author: Bodo Schulz
   description: installs and configure rspamd
@@ -16,9 +17,7 @@ galaxy_info:
       versions:
         - buster
         - bullseye
-    - name: Ubuntu
-      versions:
-        - 20.04
+        - bookworm
 
   galaxy_tags:
     - mail
