@@ -24,13 +24,12 @@ Tested on
 
 * Arch Linux
 * Debian based
-    - Debian 10 / 11
-    - Ubuntu 20.10
-    
-    
-    
+    - Debian 11 / 12
+    - Ubuntu 22.04 / 24.04
+
+
 ## `rspamd_logging`
-    
+
 | Parameter             | Description |
 | :----                 | :-----      |
 | `type`                | Defines logging type (`file`, `console` or `syslog`). For some types mandatory attributes may be required. |

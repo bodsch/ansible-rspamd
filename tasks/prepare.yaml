@@ -22,6 +22,13 @@
         - default.yml
       skip: true
 
+- name: install dependencies
+  ansible.builtin.package:
+    name: "{{ rspamd_dependencies }}"
+    state: present
+  when:
+    - rspamd_dependencies | default([]) | count > 0
+
 - name: debian
   when:
     - ansible_os_family | lower == 'debian'
@@ -36,61 +43,11 @@
         repo: deb http://rspamd.com/apt-stable/ {{ ansible_distribution_release }} main
         filename: rspamd
 
-- name: redhat
-  when:
-    - ansible_os_family | lower == 'redhat'
-  block:
-    - name: import EPEL GPG key
-      ansible.builtin.rpm_key:
-        key: https://archive.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
-        state: present
-
-    - name: install EPEL repository
-      ansible.builtin.yum_repository:
-        name: epel
-        state: present
-        description: Extra Packages for Enterprise Linux {{ ansible_distribution_major_version }} - $basearch
-        baseurl: http://download.fedoraproject.org/pub/epel/{{ ansible_distribution_major_version }}/$basearch
-        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
-        metalink: https://mirrors.fedoraproject.org/metalink?repo=epel-{{ ansible_distribution_major_version }}&arch=$basearch&infra=$infra&content=$contentdir
-        failovermethod: priority
-        gpgcheck: 1
-        enabled: 1
-
-    - name: import rspamd GPG key
-      ansible.builtin.rpm_key:
-        key: https://rspamd.com/rpm-stable/gpg.key
-        state: present
-
-    - name: install rspamd repository
-      ansible.builtin.get_url:
-        url: https://rspamd.com/rpm-stable/centos-{{ ansible_distribution_major_version }}/rspamd.repo
-        dest: /etc/yum.repos.d/rspamd.repo
-        mode: 0660
-      register: download_artefact
-      until: download_artefact is succeeded
-      retries: 5
-      delay: 2
-
-    - name: update rpm cache (yum) # noqa 'command-instead-of-module'
-      ansible.builtin.command: yum clean metadata
-      args:
-        warn: false
-      when:
-        - ansible_distribution_major_version | int == 7
-
-    - name: update rpm cache (dnf) # noqa 'command-instead-of-module'
-      ansible.builtin.command: dnf clean metadata
-      args:
-        warn: false
-      when:
-        - ansible_distribution_major_version | int >= 8
-
 - name: update package cache
   ansible.builtin.package:
     update_cache: true
 
-- name: merge dovecot configuration between defaults and custom
+- name: merge rspamd configuration between defaults and custom
   ansible.builtin.set_fact:
     rspamd_logging: "{{ rspamd_defaults_logging | combine(rspamd_logging, recursive=True) }}"
     rspamd_workers: "{{ rspamd_defaults_workers | combine(rspamd_workers, recursive=True) }}"

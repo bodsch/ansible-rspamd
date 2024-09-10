@@ -1,5 +1,7 @@
 ---
 
+rspamd_dependencies: []
+
 # https://rspamd.com/doc/configuration/logging.html#configuration-parameters
 rspamd_defaults_logging:
   ## type                    Defines logging type (file, console or syslog). For some types mandatory attributes may be required.
